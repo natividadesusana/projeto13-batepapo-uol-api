@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import Joi from "joi";
 import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc.js";
+import timezone from "dayjs/plugin/timezone.js";
 
 
 // Server creation
@@ -23,8 +23,8 @@ const mongoClient = new MongoClient(process.env.DATABASE_URL);
 try {
   await mongoClient.connect();
   console.log("MongoDB Connected!");
-} catch (err) {
-  console.log(err.message);
+} catch (error) {
+  console.log(error.message);
 }
 const db = mongoClient.db();
 
@@ -64,7 +64,7 @@ app.post("/participants", async (req, res) => {
       to: "Todos",
       text: "entra na sala...",
       type: "status",
-      time: dayjs().tz("America/Brasilia").format("HH:mm:ss"),
+      time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
     };
 
     await db.collection("messages").insertOne(message);
@@ -78,5 +78,5 @@ app.post("/participants", async (req, res) => {
 
 
 // Leave the app listening, waiting for requests
-const DOOR = 5000; // Available: 3000 to 5999
+const DOOR = 3110; // Available: 3000 to 5999
 app.listen(DOOR, () => console.log(`Server running on port ${DOOR}`));

@@ -4,6 +4,8 @@ import dotenv from "dotenv";
 import { MongoClient } from "mongodb";
 import Joi from "joi";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
 
 
 // Server creation
@@ -27,8 +29,14 @@ try {
 const db = mongoClient.db();
 
 
+// This adds the UTC and timezone plugins to dayjs, allowing the use of timezones in the application.
+dayjs.extend(utc);
+dayjs.extend(timezone);
+
+
 // Endpoints
-app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
+app.post("/participants", async (req, res) => {
+  // req (request information) & res (reply information we will send)
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });

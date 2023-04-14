@@ -62,7 +62,6 @@ app.post("/participants", async (req, res) => { // req (request information) & r
     await db.collection("messages").insertOne(message);
 
     return res.status(201).send();
-    
   } catch (error) {
     console.error(error.message);
     return res.status(422).send({ message: error.message });

@@ -35,7 +35,8 @@ dayjs.extend(timezone);
 
 
 // Endpoints
-app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
+app.post("/participants", async (req, res) => {
+  // req (request information) & res (reply information we will send)
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });
@@ -79,11 +80,16 @@ app.post("/participants", async (req, res) => { // req (request information) & r
 app.get("/participants", async (req, res) => {
   try {
     const participants = await db.collection("participants").find().toArray();
-    if(!Array.isArray(participants)) {
-      console.error("Participants list is not in the expected format!")
-    }
     const allParticipants = participants.map((participant) => participant.name);
-    return res.send(allParticipants);
+    if (
+      Array.isArray(allParticipants) &&
+      allParticipants.length > 0 &&
+      typeof allParticipants[0] === "string"
+    ) {
+      return res.send(allParticipants);
+    } else {
+      return res.status(500).send({ message: "Internal Server Error" });
+    }
   } catch (error) {
     console.error(error.message);
     return res.status(500).send({ message: "Internal Server Error" });

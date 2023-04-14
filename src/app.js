@@ -29,14 +29,13 @@ try {
 const db = mongoClient.db();
 
 
-// This adds the UTC and timezone plugins to dayjs, allowing the use of timezones in the application.
+// This adds the UTC and timezone plugins to dayjs, allowing the use of timezones in the application
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 
 // Endpoints
-app.post("/participants", async (req, res) => {
-  // req (request information) & res (reply information we will send)
+app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });
@@ -73,6 +72,18 @@ app.post("/participants", async (req, res) => {
   } catch (error) {
     console.error(error.message);
     return res.status(422).send({ message: error.message });
+  }
+});
+
+
+app.get("/participants", async (req, res) => {
+  try {
+    const participants = await db.collection("participants").find().toArray();
+    const allParticipants = participants.map((participant) => participant.name);
+    return res.send(allParticipants);
+  } catch (error) {
+    console.error(error.message);
+    return res.status(500).send({ message: "Internal Server Error" });
   }
 });
 

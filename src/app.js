@@ -79,6 +79,9 @@ app.post("/participants", async (req, res) => { // req (request information) & r
 app.get("/participants", async (req, res) => {
   try {
     const participants = await db.collection("participants").find().toArray();
+    if(!Array.isArray(participants)) {
+      console.error("Participants list is not in the expected format!")
+    }
     const allParticipants = participants.map((participant) => participant.name);
     return res.send(allParticipants);
   } catch (error) {

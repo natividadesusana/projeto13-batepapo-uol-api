@@ -78,5 +78,5 @@ app.post("/participants", async (req, res) => {
 
 
 // Leave the app listening, waiting for requests
-const DOOR = 3110; // Available: 3000 to 5999
+const DOOR = 5000; // Available: 3000 to 5999
 app.listen(DOOR, () => console.log(`Server running on port ${DOOR}`));

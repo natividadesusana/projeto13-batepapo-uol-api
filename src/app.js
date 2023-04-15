@@ -35,15 +35,19 @@ dayjs.extend(timezone);
 
 
 // Endpoints
-app.post("/participants", async (req, res) => {
-  // req (request information) & res (reply information we will send)
+app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });
 
-  try {
-    await schema.validateAsync(req.body);
+  const validation = schema.validate(req.body, { abortEarly: false });
 
+  if (validation.error) {
+    const errors = validation.error.details.map((detail) => detail.message);
+    return res.status(422).send(errors);
+  }
+
+  try {
     const participant = {
       name: req.body.name,
       lastStatus: Date.now(),
@@ -69,10 +73,10 @@ app.post("/participants", async (req, res) => {
 
     await db.collection("messages").insertOne(message);
 
-    return res.status(201).send();
+    res.status(201).send();
   } catch (error) {
     console.error(error.message);
-    return res.status(422).send({ message: error.message });
+    res.status(422).send({ message: error.message });
   }
 });
 
@@ -81,18 +85,10 @@ app.get("/participants", async (req, res) => {
   try {
     const participants = await db.collection("participants").find().toArray();
     const allParticipants = participants.map((participant) => participant.name);
-    if (
-      Array.isArray(allParticipants) &&
-      allParticipants.length > 0 &&
-      typeof allParticipants[0] === "string"
-    ) {
-      return res.send(allParticipants);
-    } else {
-      return res.status(500).send({ message: "Internal Server Error" });
-    }
+    res.send(allParticipants || []);
   } catch (error) {
     console.error(error.message);
-    return res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({ message: "Internal Server Error" });
   }
 });
 

@@ -47,7 +47,7 @@ setInterval(async () => {
       const message = {
         type: "status",
         from: participantName,
-        text: "sai da sala...",
+        text: "Sai da sala...",
         time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
       };
 
@@ -168,11 +168,8 @@ app.post("/messages", async (req, res) => {
 // ---------- GET /MESSAGES
 app.get("/messages", async (req, res) => {
   const user = req.header("User");
-  if (!user) {
-    return res.status(422).send({ message: "User header is missing!" });
-  }
 
-  const limit = parseInt(req.query.limit) || 10;
+  const limit = parseInt(req.query.limit);
 
   if (limit < 1 || isNaN(limit)) {
     return res.status(422).send({ message: "Invalid limit value!" });
@@ -183,8 +180,9 @@ app.get("/messages", async (req, res) => {
       .collection("messages")
       .find({
         $or: [
-          { to: { $in: [user, "Todos"] } },
+          { to: user },
           { from: user },
+          { to: "Todos" },
           { type: "public" },
         ],
       })

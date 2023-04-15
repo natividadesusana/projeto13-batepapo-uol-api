@@ -34,24 +34,22 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 
-// Automatic removal of inactive users
+// ---------- AUTOMATIC REMOVAL OF INACTIVE USERS
 setInterval(async () => {
   try {
     const timeLimit = dayjs().subtract(10, "seconds").valueOf();
     const deletedParticipants = await db
       .collection("participants")
-      .deleteMany({ lastStatus: { $lt: timeLimit } });
+      .findOneAndDelete({ lastStatus: { $lt: timeLimit } });
 
-    if (deletedParticipants.deletedCount > 0) {
-      const messages = deletedParticipants.deletedIds.map((id) => ({
-        from: id,
-        to: "Todos",
-        text: "sai da sala...",
+    if (deletedParticipants.value) {
+      const message = {
         type: "status",
-        time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
-      }));
+        from: deletedParticipants.value.name,
+        text: "sai da sala...",
+      };
 
-      await db.collection("messages").insertMany(messages);
+      await db.collection("messages").insertOne(message);
     }
   } catch (error) {
     console.error(error.message);

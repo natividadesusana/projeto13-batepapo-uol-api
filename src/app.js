@@ -35,6 +35,8 @@ dayjs.extend(timezone);
 
 
 // Endpoints
+
+// ---------- POST /PARTICIPANTS
 app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
@@ -81,6 +83,7 @@ app.post("/participants", async (req, res) => { // req (request information) & r
 });
 
 
+// ---------- GET /PARTICIPANTS
 app.get("/participants", async (req, res) => {
   try {
     const participants = await db.collection("participants").find().toArray();
@@ -92,6 +95,7 @@ app.get("/participants", async (req, res) => {
 });
 
 
+// ---------- POST /MESSAGES
 app.post("/messages", async (req, res) => {
   const schema = Joi.object({
     to: Joi.string().trim().min(1).required(),
@@ -123,7 +127,7 @@ app.post("/messages", async (req, res) => {
     time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
   };
 
-  await db.collection("message").insertOne(message);
+  await db.collection("messages").insertOne(message);
 
   res.status(201).send();
 });

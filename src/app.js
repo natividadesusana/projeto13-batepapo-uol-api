@@ -84,8 +84,7 @@ app.post("/participants", async (req, res) => { // req (request information) & r
 app.get("/participants", async (req, res) => {
   try {
     const participants = await db.collection("participants").find().toArray();
-    const allParticipants = participants.map((participant) => participant.name);
-    res.send(allParticipants || []);
+    res.send(participants || []);
   } catch (error) {
     console.error(error.message);
     res.status(500).send({ message: "Internal Server Error" });

@@ -90,7 +90,7 @@ app.get("/participants", async (req, res) => {
     res.send(participants || []);
   } catch (error) {
     console.error(error.message);
-    res.status(500).send({ message: "Internal Server Error" });
+    res.status(500).send({ message: "Internal Server Error!" });
   }
 });
 
@@ -130,6 +130,39 @@ app.post("/messages", async (req, res) => {
   await db.collection("messages").insertOne(message);
 
   res.status(201).send();
+});
+
+
+// ---------- GET /MESSAGES
+app.get("/messages", async (req, res) => {
+  const user = req.header("User");
+
+  const limit = parseInt(req.query.limit);
+
+  if (limit < 1 || isNaN(limit)) {
+    return res.status(422).send({ message: "Invalid limit value!" });
+  }
+
+  try {
+    const messages = await db
+      .collection("messages")
+      .find({
+        $or: [
+          { to: user },
+          { from: user },
+          { to: "Todos" },
+          { type: "public" },
+        ],
+      })
+      .sort({ $natural: -1 })
+      .limit(limit)
+      .toArray();
+
+    res.send(messages);
+  } catch (error) {
+    console.error(error.message);
+    res.status(500).send({ message: "Internal Server Error!" });
+  }
 });
 
 

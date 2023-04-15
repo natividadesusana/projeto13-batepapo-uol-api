@@ -47,7 +47,7 @@ setInterval(async () => {
       const message = {
         type: "status",
         from: participantName,
-        text: "Sai da sala...",
+        text: "sai da sala...",
         time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
       };
 

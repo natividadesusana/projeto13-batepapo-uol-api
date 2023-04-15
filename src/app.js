@@ -34,6 +34,31 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 
+// Automatic removal of inactive users
+setInterval(async () => {
+  try {
+    const timeLimit = dayjs().subtract(10, "seconds").valueOf();
+    const deletedParticipants = await db
+      .collection("participants")
+      .deleteMany({ lastStatus: { $lt: timeLimit } });
+
+    if (deletedParticipants.deletedCount > 0) {
+      const messages = deletedParticipants.deletedIds.map((id) => ({
+        from: id,
+        to: "Todos",
+        text: "sai da sala...",
+        type: "status",
+        time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
+      }));
+
+      await db.collection("messages").insertMany(messages);
+    }
+  } catch (error) {
+    console.error(error.message);
+  }
+}, 15000);
+
+
 // Endpoints
 
 // ---------- POST /PARTICIPANTS

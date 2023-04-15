@@ -166,6 +166,30 @@ app.get("/messages", async (req, res) => {
 });
 
 
+// ---------- POST /STATUS
+app.post("/status", async (req, res) => {
+  const name = req.header("User");
+
+  if (!name) {
+    return res.status(404).send();
+  }
+
+  const existingParticipant = await db
+    .collection("participants")
+    .findOne({ name });
+
+  if (!existingParticipant) {
+    return res.status(404).send();
+  }
+
+  await db
+    .collection("participants")
+    .updateOne({ name }, { $set: { lastStatus: Date.now() } });
+
+  res.status(200).send();
+});
+
+
 // Leave the app listening, waiting for requests
 const DOOR = 5000; // Available: 3000 to 5999
 app.listen(DOOR, () => console.log(`Server running on port ${DOOR}`));

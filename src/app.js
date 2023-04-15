@@ -92,6 +92,43 @@ app.get("/participants", async (req, res) => {
 });
 
 
+app.post("/messages", async (req, res) => {
+  const schema = Joi.object({
+    to: Joi.string().trim().min(1).required(),
+    text: Joi.string().trim().min(1).required(),
+    type: Joi.string().valid("message", "private_message").required(),
+  });
+
+  const validation = schema.validate(req.body, { abortEarly: false });
+
+  if (validation.error) {
+    const errors = validation.error.details.map((detail) => detail.message);
+    return res.status(422).send(errors);
+  }
+
+  const from = req.header("User");
+
+  const existingParticipant = await db
+    .collection("participants")
+    .findOne({ name: from });
+  if (!existingParticipant) {
+    return res.status(422).send({ message: "Participant does not exist!" });
+  }
+
+  const message = {
+    from,
+    to: req.body.to,
+    text: req.body.text,
+    type: req.body.type,
+    time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
+  };
+
+  await db.collection("message").insertOne(message);
+
+  res.status(201).send();
+});
+
+
 // Leave the app listening, waiting for requests
 const DOOR = 5000; // Available: 3000 to 5999
 app.listen(DOOR, () => console.log(`Server running on port ${DOOR}`));

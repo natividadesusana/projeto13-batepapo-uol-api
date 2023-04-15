@@ -43,11 +43,20 @@ setInterval(async () => {
       .findOneAndDelete({ lastStatus: { $lt: timeLimit } });
 
     if (deletedParticipants.value) {
+      const participantName = deletedParticipants.value.name;
       const message = {
         type: "status",
-        from: deletedParticipants.value.name,
+        from: participantName,
         text: "sai da sala...",
+        time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
       };
+
+      await db
+        .collection("participants")
+        .updateOne(
+          { name: participantName },
+          { $set: { lastStatus: Date.now() } }
+        );
 
       await db.collection("messages").insertOne(message);
     }
@@ -159,8 +168,11 @@ app.post("/messages", async (req, res) => {
 // ---------- GET /MESSAGES
 app.get("/messages", async (req, res) => {
   const user = req.header("User");
+  if (!user) {
+    return res.status(422).send({ message: "User header is missing!" });
+  }
 
-  const limit = parseInt(req.query.limit);
+  const limit = parseInt(req.query.limit) || 10;
 
   if (limit < 1 || isNaN(limit)) {
     return res.status(422).send({ message: "Invalid limit value!" });
@@ -171,9 +183,8 @@ app.get("/messages", async (req, res) => {
       .collection("messages")
       .find({
         $or: [
-          { to: user },
+          { to: { $in: [user, "Todos"] } },
           { from: user },
-          { to: "Todos" },
           { type: "public" },
         ],
       })

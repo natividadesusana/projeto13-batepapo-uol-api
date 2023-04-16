@@ -45,9 +45,10 @@ setInterval(async () => {
     if (deletedParticipants.value) {
       const participantName = deletedParticipants.value.name;
       const message = {
-        type: "status",
         from: participantName,
+        to: "Todos",
         text: "sai da sala...",
+        type: "status",
         time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
       };
 

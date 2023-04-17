@@ -6,6 +6,7 @@ import Joi from "joi";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc.js";
 import timezone from "dayjs/plugin/timezone.js";
+import { stripHtml } from "string-strip-html";
 
 
 // Server creation
@@ -71,6 +72,7 @@ setInterval(async () => {
 
 // ---------- POST /PARTICIPANTS
 app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
+  const name = stripHtml(req.body.name.trim()).result;
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });
@@ -84,9 +86,10 @@ app.post("/participants", async (req, res) => { // req (request information) & r
 
   try {
     const participant = {
-      name: req.body.name,
+      name: name,
       lastStatus: Date.now(),
     };
+    
 
     const existingParticipant = await db
       .collection("participants")
@@ -152,10 +155,14 @@ app.post("/messages", async (req, res) => {
     return res.status(422).send({ message: "Participant does not exist!" });
   }
 
+  const fromSanitized = stripHtml(from.trim()).result;
+  const toSanitized = stripHtml(req.body.to.trim()).result;
+  const textSanitized = stripHtml(req.body.text.trim()).result;
+
   const message = {
-    from,
-    to: req.body.to,
-    text: req.body.text,
+    from: fromSanitized,
+    to: toSanitized,
+    text: textSanitized,
     type: req.body.type,
     time: dayjs().tz("America/Sao_Paulo").format("HH:mm:ss"),
   };

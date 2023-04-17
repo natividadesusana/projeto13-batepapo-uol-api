@@ -77,7 +77,7 @@ Create a .env file in the root directory of the project and add the necessary en
 
 - Run the back-end with
 
-      npm start
+      	npm start
 
 Access http://localhost:5000 on your browser to run the API.
 

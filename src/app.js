@@ -72,11 +72,11 @@ setInterval(async () => {
 
 // ---------- POST /PARTICIPANTS
 app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
-  if (!req.body.hasOwnProperty('name')) { 
+  const name = stripHtml(req.body.name.trim()).result;
+
+  if (!name) {
     return res.status(422).send({ message: "Name is required!" });
   }
-
-  const name = stripHtml(req.body.name.trim()).result;
 
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
@@ -121,7 +121,7 @@ app.post("/participants", async (req, res) => { // req (request information) & r
     res.status(422).send({ message: error.message });
   }
 });
-  
+
 
 // ---------- GET /PARTICIPANTS
 app.get("/participants", async (req, res) => {

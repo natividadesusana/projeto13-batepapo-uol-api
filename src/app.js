@@ -72,12 +72,12 @@ setInterval(async () => {
 
 // ---------- POST /PARTICIPANTS
 app.post("/participants", async (req, res) => { // req (request information) & res (reply information we will send)
-  const name = stripHtml(req.body.name.trim()).result;
+  const name = stripHtml(req.body.name?.trim()).result;
   const schema = Joi.object({
     name: Joi.string().trim().min(1).required(),
   });
 
-  const validation = schema.validate(req.body, { abortEarly: false });
+  const validation = schema.validate({ name }, { abortEarly: false });
 
   if (validation.error) {
     const errors = validation.error.details.map((detail) => detail.message);
@@ -89,7 +89,6 @@ app.post("/participants", async (req, res) => { // req (request information) & r
       name: name,
       lastStatus: Date.now(),
     };
-    
 
     const existingParticipant = await db
       .collection("participants")

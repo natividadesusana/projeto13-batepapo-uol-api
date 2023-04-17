@@ -21,7 +21,7 @@ This is a chat API that allows users to register as participants and send messag
 A route to create and register a new user. If there's already a participant with the same name, a 409 status code error will be returned. A 201 status code will be returned upon success. The request body should be:
 
     {
-      "name": "John Doe"
+      "name": "João"
     }
 
 ### GET/participants
@@ -55,7 +55,7 @@ A request that retrieves a list of messages in the chat. If there are no message
 The time format should be: (HH:mm:ss)
 
 	{
-        "from": "John Doe",
+        "from": "João",
         "to": "Todos",
         "text": "Hello, world!",
         "type": "message",
